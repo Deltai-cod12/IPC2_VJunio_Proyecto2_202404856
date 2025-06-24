@@ -4,3 +4,5 @@ class Usuario:
         self.contrasenia = contrasenia
         self.nombre = nombre
         self.tipo = tipo
+        self.cursos = []
+        self.horarios = None

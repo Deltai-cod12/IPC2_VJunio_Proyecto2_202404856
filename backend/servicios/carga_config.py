@@ -44,7 +44,12 @@ def procesar_xml_configuracion(archivo_xml):
         for asignacion in c_estudiantes:
             asignaciones["estudiantes"].append((asignacion.get('codigo'), asignacion.text.strip()))
 
-    # Retorno resumido por ahora
+    # Asignar cursos a cada tutor
+    for codigo, id_tutor in asignaciones["tutores"]:
+        for usuario in usuarios:
+            if usuario.id == id_tutor and usuario.tipo == "tutor":
+                usuario.cursos.append(codigo)
+
     return {
         "mensaje": "Archivo procesado correctamente",
         "cursos_cargados": len(cursos),

@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cargar Archivo - Admin</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+
+    <nav>
+        <a href="{% url 'cargar_archivo' %}">Cargar Archivo</a>
+        <a href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
+        <a href="{% url 'info_estudiante' %}">Información</a>
+        <a href="{% url 'cerrar_sesion' %}" style="color: var(--accent-color);">Cerrar Sesión</a>
+    </nav>
+
+
+    <h1>Cargar archivo de configuración</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label><strong>Selecciona un archivo XML:</strong></label><br>
+        <input type="file" id="archivo" name="archivo" accept=".xml"><br><br>
+
+        <textarea id="xml_content" name="xml_content" placeholder="Pega o edita aquí tu archivo XML...">{{ contenido }}</textarea><br>
+
+        <button type="submit" name="accion" value="procesar" class="btn">Procesar XML</button>
+        <button type="submit" name="accion" value="limpiar" class="btn">Limpiar</button>
+    </form>
+
+    {% if resultado %}
+        <h2>Resultado</h2>
+        <pre>{{ resultado }}</pre>
+    {% endif %}
+
+    <script>
+        document.getElementById('archivo').addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('xml_content').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+</body>
+</html>
+

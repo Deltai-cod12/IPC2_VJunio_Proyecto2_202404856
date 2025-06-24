@@ -1,0 +1,154 @@
+:root {
+    --tutor-primary: #c0392b;
+    --tutor-dark: #922b21;
+    --accent-color: #e67e22;
+    --light-bg: #fefefe;
+    --bg: #f8f9fa;
+    --text: #2c3e50;
+    --white: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+nav.nav-tutor {
+    background-color: var(--tutor-primary);
+    padding: 15px;
+    box-shadow: 0 3px 6px var(--shadow);
+}
+
+nav.nav-tutor a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+    padding: 10px 18px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+nav.nav-tutor a:hover {
+    background-color: var(--tutor-dark);
+    transform: scale(1.05);
+}
+
+nav.nav-tutor .cerrar {
+    background-color: var(--accent-color);
+}
+
+h1 {
+    margin-top: 30px;
+    color: var(--tutor-primary);
+    font-size: 28px;
+}
+
+p {
+    margin-bottom: 25px;
+    color: #555;
+}
+
+form {
+    background-color: var(--white);
+    width: 80%;
+    max-width: 800px;
+    margin: auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--shadow);
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+input[type="file"] {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+textarea {
+    width: 100%;
+    height: 280px;
+    resize: none;
+    font-family: monospace;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--tutor-primary);
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15);
+}
+
+.btn {
+    background-color: var(--tutor-primary);
+    color: white;
+    padding: 12px 24px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+    background-color: var(--tutor-dark);
+    transform: scale(1.05);
+}
+
+input[type="submit"][value="Limpiar"] {
+    background-color: var(--accent-color);
+}
+
+input[type="submit"][value="Limpiar"]:hover {
+    background-color: #ca5d0b;
+}
+
+/* Tabla */
+.tabla-horarios {
+    width: 90%;
+    max-width: 1000px;
+    margin: 30px auto; /* ⬅️ Centra la tabla y da espacio arriba y abajo */
+    border-collapse: collapse;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+
+.tabla-horarios th,
+.tabla-horarios td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    vertical-align: middle;
+}
+
+.tabla-horarios thead th {
+    background-color: #c0392b;
+    color: #fff;
+}
+
+.bloque-curso {
+    background-color: #f5c6cb;
+    border: 1px solid #c82333;
+    padding: 5px;
+    border-radius: 4px;
+    font-weight: bold;
+}

@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios Cargados</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="{% url 'cargar_archivo' %}">Cargar Archivo</a>
+        <a href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
+        <a href="{% url 'info_estudiante' %}">Información</a>
+    </nav>
+
+    <h1>Usuarios Cargados</h1>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Contraseña</th>
+                <th>Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.usuario }}</td>
+                <td>{{ u.contrasenia }}</td>
+                <td>{{ u.tipo }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

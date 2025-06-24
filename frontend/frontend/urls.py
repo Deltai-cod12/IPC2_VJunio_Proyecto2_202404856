@@ -17,8 +17,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from login.views import login_view
+from administrador.views import dashboard_admin, ver_usuarios, informacion, cerrar_sesion
+from tutor.views import cargar_horarios, cargar_notas
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls),  # Admin real de Django
     path('', login_view),
+    path('pagina-admin/', dashboard_admin, name='cargar_archivo'),
+    path('usuarios/', ver_usuarios, name='ver_usuarios'),
+    path('informacion/', informacion, name='info_estudiante'),
+    path('logout/', cerrar_sesion, name='cerrar_sesion'),
+    path('pagina-tutor/', cargar_horarios, name='cargar_horarios'),
+    path('tutor/cargar-notas/', cargar_notas, name='cargar_notas'),
+    
 ]

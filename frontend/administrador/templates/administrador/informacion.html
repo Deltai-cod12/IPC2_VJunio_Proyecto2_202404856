@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Información</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="{% url 'cargar_archivo' %}">Cargar Archivo</a>
+        <a href="{% url 'ver_usuarios' %}">Ver Usuarios</a>
+        <a href="{% url 'info_estudiante' %}">Información</a>
+    </nav>
+
+<div class="carnet">
+    <h2>Información</h2>
+    <p><strong>Nombre:</strong> Angel Rodríguez</p>
+    <p><strong>Carné:</strong> 202404856</p>
+    <p><strong>Repositorio:</strong> <a href="https://github.com/Deltai-cod12/IPC2_VJunio_Proyecto2_202404856" target="_blank">Ver en GitHub</a></p>
+</div>
+</body>
+</html>

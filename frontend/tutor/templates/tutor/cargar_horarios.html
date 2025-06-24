@@ -1,0 +1,70 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Horarios - Tutor</title>
+    <link rel="stylesheet" href="{% static 'css/tutor2.css' %}">
+</head>
+<body>
+    <nav class="nav-tutor">
+        <a href="{% url 'cargar_horarios' %}">Cargar Horarios</a>
+        <a href="{% url 'cargar_notas' %}">Cargar Notas</a>
+        <a href="{% url 'cerrar_sesion' %}" class="cerrar">Cerrar Sesión</a>
+    </nav>
+
+    <div class="contenido">
+        <h1>Bienvenido, {{ nombre_tutor }} (Tutor)</h1>
+        <h2>Configurar horarios de tutoría</h2>
+        <p>Sube o edita tu archivo XML para registrar tus horarios de cursos asignados.</p>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" id="archivo" name="archivo" accept=".xml"><br><br>
+            <textarea id="xml_content" name="xml_content" placeholder="Pega o edita aquí tu archivo XML...">{{ contenido }}</textarea><br>
+
+            <input type="submit" name="accion" value="Procesar XML" class="btn">
+            <input type="submit" name="accion" value="Limpiar" class="btn">
+        </form>
+    {% if horarios %}
+        <h2>Horarios cargados</h2>
+        <table class="tabla-horarios">
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    {% for dia in dias %}
+                        <th>{{ dia }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in horarios %}
+                    <tr>
+                        <td><strong>{{ h.codigo }}</strong></td>
+                        {% for dia in dias %}
+                            <td>{{ h.horario_inicio }} - {{ h.horario_fin }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endif %}
+
+    </div>
+
+    <script>
+        document.getElementById('archivo').addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('xml_content').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+
+</body>
+</html>
