@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 import io
 from servicios.carga_horarios import procesar_xml_horarios
 from servicios.carga_notas import parse_notas_xml, cargar_notas_en_matriz
+from servicios.graficador_matriz import graficar_matriz  # Asegúrate de importar esta función
 
 tutor_bp = Blueprint('tutor_bp', __name__)
 
@@ -15,6 +16,7 @@ def cargar_horarios():
 
     resultado = procesar_xml_horarios(archivo, id_tutor)
     return jsonify(resultado), 200
+
 
 @tutor_bp.route('/cargar_notas', methods=['POST'])
 def cargar_notas():
@@ -30,11 +32,12 @@ def cargar_notas():
 
         # Procesar notas
         resultado = parse_notas_xml(archivo_io)
-        cargar_notas_en_matriz(resultado)
+        matriz = cargar_notas_en_matriz(resultado)
 
-        return "Notas procesadas correctamente", 200
+        # Generar gráfico .dot y .png
+        graficar_matriz(matriz, nombre_salida=f"matriz_notas_{resultado['codigo_curso']}")
+
+        return "Notas procesadas y graficadas correctamente", 200
 
     except Exception as e:
         return f"Error procesando notas: {str(e)}", 500
-
-
