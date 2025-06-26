@@ -11,6 +11,7 @@
     <nav class="nav-tutor">
         <a href="{% url 'cargar_horarios' %}">Cargar Horarios</a>
         <a href="#">Cargar Notas</a>
+        <a href="{% url 'reportes' %}">Reportes</a>
         <a href="{% url 'cerrar_sesion' %}" class="cerrar">Cerrar Sesión</a>
     </nav>
 
@@ -26,26 +27,24 @@
 
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            <input type="file" id="archivo" name="archivo" accept=".xml"><br><br>
-            <textarea id="xml_content" name="xml_content" placeholder="Pega o edita aquí tu archivo XML...">{{ contenido }}</textarea><br>
+            <input type="file" name="archivo" accept=".xml"><br><br>
+            <textarea name="xml_content" placeholder="Pega o edita aquí tu archivo XML...">{{ contenido }}</textarea><br>
 
             <input type="submit" name="accion" value="Procesar Notas" class="btn">
             <input type="submit" name="accion" value="Limpiar Notas" class="btn">
         </form>
+
+        {% if imagenes_notas %}
+            <h3>Historial de matrices generadas:</h3>
+            <div class="imagenes-notas-container">
+                {% for img in imagenes_notas %}
+                    <div style="margin-bottom: 25px;">
+                        <h4>{{ img.curso }}</h4>
+                        <img src="{{ img.ruta }}" alt="Matriz de notas" style="max-width: 100%; border: 1px solid #ccc; padding: 8px;">
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
-
-    <script>
-        document.getElementById('archivo').addEventListener('change', function () {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('xml_content').value = e.target.result;
-                };
-                reader.readAsText(file);
-            }
-        });
-    </script>
-
 </body>
 </html>

@@ -23,8 +23,8 @@ def login_view(request):
                 if tipo == "admin":
                     return redirect('/pagina-admin')
                 elif tipo == "tutor":
-                    request.session['id_tutor'] = usuario       # ✅ ID del tutor
-                    request.session['nombre_tutor'] = usuario   # ✅ Nombre para mostrar
+                    request.session['id_tutor'] = usuario       #  ID del tutor
+                    request.session['nombre_tutor'] = usuario   #  Nombre para mostrar
                     return redirect('/pagina-tutor')
                 elif tipo == "estudiante":
                     return redirect('/estudiante')

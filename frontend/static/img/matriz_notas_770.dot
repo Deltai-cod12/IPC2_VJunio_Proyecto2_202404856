@@ -1,0 +1,71 @@
+digraph G {
+    node [shape=box, style=filled, fontname="Helvetica"];
+    edge [fontname="Helvetica"];
+    rankdir=TB;
+    label="Matriz Dispersa de Notas";
+    fontsize=20;
+    compound=true;
+    nodesep=0.5;
+    ranksep=0.5;
+    newrank=true;
+
+    /* ESTILOS */
+    node [fillcolor="#e6f3ff"];
+
+    /* ENCABEZADOS DE COLUMNAS (CARNETS) */
+    subgraph cluster_header {
+        label="";
+        style=invis;
+        rank=same;
+        node [width=0.8, height=0.8, fillcolor="#cce0ff"];
+        col_1234 [label="1234", group="col_1234"];
+        col_5678 [label="5678", group="col_5678"];
+    }
+
+    /* ESTRUCTURA PRINCIPAL */
+    node [fillcolor="#ffebcc"];
+    tarea_Tarea1 [label="Tarea1", group="tareas"];
+    nota_Tarea1_1234 [label="85", fillcolor="white", group="col_1234"];
+    tarea_Tarea1 -> nota_Tarea1_1234 [dir=both, color=gray];
+    empty_Tarea1_5678 [label="", width=0.6, height=0.6, style=invis, group="col_5678"];
+    nota_Tarea1_1234 -> empty_Tarea1_5678 [dir=both, color=gray];
+    {rank=same; tarea_Tarea1 nota_Tarea1_1234 empty_Tarea1_5678};
+    tarea_Tarea1 -> tarea_Tarea2 [style=invis, weight=10];
+    tarea_Tarea2 [label="Tarea2", group="tareas"];
+    empty_Tarea2_1234 [label="", width=0.6, height=0.6, style=invis, group="col_1234"];
+    tarea_Tarea2 -> empty_Tarea2_1234 [dir=both, color=gray];
+    nota_Tarea2_5678 [label="90", fillcolor="white", group="col_5678"];
+    empty_Tarea2_1234 -> nota_Tarea2_5678 [dir=both, color=gray];
+    {rank=same; tarea_Tarea2 empty_Tarea2_1234 nota_Tarea2_5678};
+    tarea_Tarea2 -> tarea_Tarea3 [style=invis, weight=10];
+    tarea_Tarea3 [label="Tarea3", group="tareas"];
+    nota_Tarea3_1234 [label="78", fillcolor="white", group="col_1234"];
+    tarea_Tarea3 -> nota_Tarea3_1234 [dir=both, color=gray];
+    empty_Tarea3_5678 [label="", width=0.6, height=0.6, style=invis, group="col_5678"];
+    nota_Tarea3_1234 -> empty_Tarea3_5678 [dir=both, color=gray];
+    {rank=same; tarea_Tarea3 nota_Tarea3_1234 empty_Tarea3_5678};
+    tarea_Tarea3 -> tarea_Tarea4 [style=invis, weight=10];
+    tarea_Tarea4 [label="Tarea4", group="tareas"];
+    empty_Tarea4_1234 [label="", width=0.6, height=0.6, style=invis, group="col_1234"];
+    tarea_Tarea4 -> empty_Tarea4_1234 [dir=both, color=gray];
+    nota_Tarea4_5678 [label="100", fillcolor="white", group="col_5678"];
+    empty_Tarea4_1234 -> nota_Tarea4_5678 [dir=both, color=gray];
+    {rank=same; tarea_Tarea4 empty_Tarea4_1234 nota_Tarea4_5678};
+    tarea_Tarea4 -> tarea_Tarea5 [style=invis, weight=10];
+    tarea_Tarea5 [label="Tarea5", group="tareas"];
+    nota_Tarea5_1234 [label="88", fillcolor="white", group="col_1234"];
+    tarea_Tarea5 -> nota_Tarea5_1234 [dir=both, color=gray];
+    empty_Tarea5_5678 [label="", width=0.6, height=0.6, style=invis, group="col_5678"];
+    nota_Tarea5_1234 -> empty_Tarea5_5678 [dir=both, color=gray];
+    {rank=same; tarea_Tarea5 nota_Tarea5_1234 empty_Tarea5_5678};
+    col_1234 -> nota_Tarea1_1234 [dir=both, color=gray];
+    nota_Tarea1_1234 -> empty_Tarea2_1234 [dir=both, color=gray];
+    empty_Tarea2_1234 -> nota_Tarea3_1234 [dir=both, color=gray];
+    nota_Tarea3_1234 -> empty_Tarea4_1234 [dir=both, color=gray];
+    empty_Tarea4_1234 -> nota_Tarea5_1234 [dir=both, color=gray];
+    col_5678 -> empty_Tarea1_5678 [dir=both, color=gray];
+    empty_Tarea1_5678 -> nota_Tarea2_5678 [dir=both, color=gray];
+    nota_Tarea2_5678 -> empty_Tarea3_5678 [dir=both, color=gray];
+    empty_Tarea3_5678 -> nota_Tarea4_5678 [dir=both, color=gray];
+    nota_Tarea4_5678 -> empty_Tarea5_5678 [dir=both, color=gray];
+}

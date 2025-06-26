@@ -1,0 +1,65 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reportes - Tutor</title>
+    <link rel="stylesheet" href="{% static 'css/tutor2.css' %}">
+</head>
+<body>
+    <nav class="nav-tutor">
+        <a href="{% url 'cargar_horarios' %}">Cargar Horarios</a>
+        <a href="{% url 'cargar_notas' %}">Cargar Notas</a>
+        <a href="#">Reportes</a>
+        <a href="{% url 'cerrar_sesion' %}" class="cerrar">Cerrar Sesión</a>
+    </nav>
+
+    <div class="contenido">
+        <h2>Generar reportes de notas</h2>
+        <p>Selecciona un curso y tipo de reporte que deseas generar.</p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label for="curso">Curso:</label>
+            <select id="curso" name="curso" onchange="this.form.submit()">
+                <option value="">-- Selecciona un curso --</option>
+                {% for curso in cursos %}
+                    <option value="{{ curso.codigo }}" {% if curso.codigo == curso_seleccionado %}selected{% endif %}>
+                        {{ curso.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+
+            <label for="actividad">Actividad (solo para TOP de notas):</label>
+            <select id="actividad" name="actividad">
+                <option value="">-- Selecciona una actividad --</option>
+                {% for act in actividades %}
+                    <option value="{{ act }}" {% if act == actividad_seleccionada %}selected{% endif %}>
+                        {{ act }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <br><br>
+
+            <input type="submit" name="accion" value="Promedio por Actividad" class="btn">
+            <input type="submit" name="accion" value="Top de Notas" class="btn">
+            <input type="submit" name="accion" value="Exportar PDF" class="btn">
+        </form>
+
+        {% if imagen_promedio %}
+            <h3>Gráfico de promedio por actividad</h3>
+            <img src="http://127.0.0.1:5000/{{ imagen_promedio }}" alt="Gráfico de Promedio" style="max-width: 100%; border: 1px solid #ccc; padding: 10px;">
+        {% endif %}
+
+        {% if imagen_top %}
+            <h3>Gráfico Top de Notas</h3>
+            <img src="http://127.0.0.1:5000/{{ imagen_top }}" alt="Gráfico Top de Notas" style="max-width: 100%; border: 1px solid #ccc; padding: 10px;">
+        {% endif %}
+    </div>
+</body>
+</html>

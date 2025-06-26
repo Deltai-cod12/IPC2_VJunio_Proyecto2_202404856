@@ -197,3 +197,20 @@ class MatrizDispersa():
 
         dot.append('}')
         return '\n'.join(dot)
+
+    def obtener_actividades(self):
+        actividades = []
+        actual = self.filas.primero
+        while actual is not None:
+            actividades.append(actual.id) # gay el que lo lea
+            actual = actual.siguiente
+        return actividades
+
+
+    def obtener_carnets(self):
+        carnets = []
+        actual = self.columnas.primero
+        while actual:
+            carnets.append(actual.identificador)
+            actual = actual.siguiente
+        return carnets
