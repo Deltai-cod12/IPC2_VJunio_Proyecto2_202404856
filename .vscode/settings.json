@@ -1,7 +1,0 @@
-{
-    "python.analysis.extraPaths": [
-        "./backend"
-    ]
-}
-
-//Uso esto para que se pueda 

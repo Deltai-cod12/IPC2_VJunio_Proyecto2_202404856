@@ -33,7 +33,7 @@ def procesar_xml_configuracion(archivo_xml):
         asignaciones["tutores"].clear()
         asignaciones["estudiantes"].clear()
 
-        # --- Cargar cursos ---
+        #  Cargar cursos 
         cursos_xml = root.find('cursos')
         if cursos_xml is not None:
             for curso in cursos_xml.findall('curso'):
@@ -42,7 +42,7 @@ def procesar_xml_configuracion(archivo_xml):
                 if codigo and nombre and not any(c.codigo == codigo for c in cursos):
                     cursos.append(Curso(codigo, nombre))
 
-        # --- Cargar tutores ---
+        #  Cargar tutores 
         tutores_xml = root.find('tutores')
         if tutores_xml is not None:
             for tutor in tutores_xml.findall('tutor'):
@@ -52,7 +52,7 @@ def procesar_xml_configuracion(archivo_xml):
                 if rp and contrasenia and nombre and not any(u.id == rp for u in usuarios):
                     usuarios.append(Usuario(rp, contrasenia, nombre, "tutor"))
 
-        # --- Cargar estudiantes ---
+        #  Cargar estudiantes 
         estudiantes_xml = root.find('estudiantes')
         if estudiantes_xml is not None:
             for estudiante in estudiantes_xml.findall('estudiante'):
@@ -62,7 +62,7 @@ def procesar_xml_configuracion(archivo_xml):
                 if carnet and contrasenia and nombre and not any(u.id == carnet for u in usuarios):
                     usuarios.append(Usuario(carnet, contrasenia, nombre, "estudiante"))
 
-        # --- Procesar asignaciones ---
+        #  Procesar asignaciones 
         asignaciones_xml = root.find('asignaciones')
         if asignaciones_xml is not None:
             # Asignaciones de tutores (elementos <tutor_curso>)
@@ -93,7 +93,7 @@ def procesar_xml_configuracion(archivo_xml):
                         if estudiante and codigo not in estudiante.cursos:
                             estudiante.cursos.append(codigo)
 
-        # --- Generar XML de resultado ---
+        #  Generar XML de resultado 
         return generar_xml_resultado()
 
     except ET.ParseError as e:

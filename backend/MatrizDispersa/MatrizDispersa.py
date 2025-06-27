@@ -81,58 +81,52 @@ class MatrizDispersa():
 
     def generar_dot(self):
         def sanitize_id(s):
-            return re.sub(r'\W', '_', str(s))
+            # Reemplazar todos los caracteres no alfanuméricos con _
+            return re.sub(r'[^a-zA-Z0-9_]', '_', str(s))
 
-        dot = [
-            'digraph G {',
-            '    node [shape=box, style=filled, fontname="Helvetica"];',
-            '    edge [fontname="Helvetica"];',
-            '    rankdir=TB;',
-            '    label="Matriz Dispersa de Notas";',
-            '    fontsize=20;',
-            '    compound=true;',
-            '    nodesep=0.5;',
-            '    ranksep=0.5;',
-            '    newrank=true;',
-            '',
-            '    /* ESTILOS */',
-            '    node [fillcolor="#e6f3ff"];',
-            '',
-            '    /* ENCABEZADOS DE COLUMNAS (CARNETS) */',
-            '    subgraph cluster_header {',
-            '        label="";',
-            '        style=invis;',
-            '        rank=same;',
-            '        node [width=0.8, height=0.8, fillcolor="#cce0ff"];',
-        ]
+        dot = 'digraph G {\n'
+        dot += '    node [shape=box, style=filled, fontname="Helvetica"];\n'
+        dot += '    edge [fontname="Helvetica"];\n'
+        dot += '    rankdir=TB;\n'
+        dot += '    label="Matriz Dispersa de Notas";\n'
+        dot += '    fontsize=20;\n'
+        dot += '    compound=true;\n'
+        dot += '    nodesep=0.5;\n'
+        dot += '    ranksep=0.5;\n'
+        dot += '    newrank=true;\n\n'
+        dot += '    /* ESTILOS */\n'
+        dot += '    node [fillcolor="#e6f3ff"];\n\n'
+        dot += '    /* ENCABEZADOS DE COLUMNAS */\n'
+        dot += '    subgraph cluster_header {\n'
+        dot += '        label="";\n'
+        dot += '        style=invis;\n'
+        dot += '        rank=same;\n'
+        dot += '        node [width=0.8, height=0.8, fillcolor="#cce0ff"];\n'
 
-        # 1. ENCABEZADOS DE COLUMNAS
-        carnets = []
+        # Encabezados de columnas
         actual_col = self.columnas.primero
         while actual_col:
-            carnet_id = f'col_{sanitize_id(actual_col.id)}'
-            dot.append(f'        {carnet_id} [label="{actual_col.id}", group="col_{actual_col.id}"];')
-            carnets.append(carnet_id)
+            col_id = sanitize_id(actual_col.id)
+            dot += f'        col_{col_id} [label="{actual_col.id}", group="col_{col_id}"];\n'
             actual_col = actual_col.siguiente
 
-        dot.extend([
-            '    }',
-            '',
-            '    /* ESTRUCTURA PRINCIPAL */',
-            '    node [fillcolor="#ffebcc"];',
-        ])
+        dot += '    }\n\n'
+        dot += '    /* ESTRUCTURA PRINCIPAL */\n'
+        dot += '    node [fillcolor="#ffebcc"];\n'
 
-        # 2. FILAS (TAREAS) Y NOTAS
+        # Filas y nodos internos
         actual_fila = self.filas.primero
         while actual_fila:
-            tarea_id = f'tarea_{sanitize_id(actual_fila.id)}'
-            dot.append(f'    {tarea_id} [label="{actual_fila.id}", group="tareas"];')
+            fila_id = sanitize_id(actual_fila.id)
+            dot += f'    tarea_{fila_id} [label="{actual_fila.id}", group="tareas"];\n'
 
-            same_rank = [tarea_id]
-            horizontal_chain = [tarea_id]
+            # Construir cadena same_rank
+            same_rank = f'    {{rank=same; tarea_{fila_id}'
+            prev_node = f'tarea_{fila_id}'
 
             actual_col = self.columnas.primero
             while actual_col:
+                col_id = sanitize_id(actual_col.id)
                 nota_encontrada = None
                 actual_nota = actual_fila.acceso
                 while actual_nota:
@@ -142,67 +136,64 @@ class MatrizDispersa():
                     actual_nota = actual_nota.siguiente
 
                 if nota_encontrada:
-                    nota_id = f'nota_{sanitize_id(nota_encontrada.x)}_{sanitize_id(nota_encontrada.y)}'
-                    dot.append(f'    {nota_id} [label="{nota_encontrada.valor}", fillcolor="white", group="col_{actual_col.id}"];')
-                    same_rank.append(nota_id)
-                    horizontal_chain.append(nota_id)
+                    nota_id = f'nota_{sanitize_id(nota_encontrada.x)}_{col_id}'
+                    dot += f'    {nota_id} [label="{nota_encontrada.valor}", fillcolor="white", group="col_{col_id}"];\n'
+                    same_rank += f' {nota_id}'
+                    dot += f'    {prev_node} -> {nota_id} [dir=both, color=gray];\n'
+                    prev_node = nota_id
                 else:
-                    empty_id = f'empty_{sanitize_id(actual_fila.id)}_{sanitize_id(actual_col.id)}'
-                    dot.append(f'    {empty_id} [label="", width=0.6, height=0.6, style=invis, group="col_{actual_col.id}"];')
-                    same_rank.append(empty_id)
-                    horizontal_chain.append(empty_id)
-
-                # Conexión horizontal continua
-                if len(horizontal_chain) > 1:
-                    dot.append(f'    {horizontal_chain[-2]} -> {horizontal_chain[-1]} [dir=both, color=gray];')
+                    empty_id = f'empty_{fila_id}_{col_id}'
+                    dot += f'    {empty_id} [label="", width=0.6, height=0.6, style=invis, group="col_{col_id}"];\n'
+                    same_rank += f' {empty_id}'
+                    dot += f'    {prev_node} -> {empty_id} [dir=both, color=gray];\n'
+                    prev_node = empty_id
 
                 actual_col = actual_col.siguiente
 
-            dot.append(f'    {{rank=same; {" ".join(same_rank)}}};')
+            dot += same_rank + '};\n'
 
-            # Conexión vertical invisible entre tareas
+            # Conexión vertical entre filas
             if actual_fila.siguiente:
-                next_tarea = f'tarea_{sanitize_id(actual_fila.siguiente.id)}'
-                dot.append(f'    {tarea_id} -> {next_tarea} [style=invis, weight=10];')
+                next_fila_id = sanitize_id(actual_fila.siguiente.id)
+                dot += f'    tarea_{fila_id} -> tarea_{next_fila_id} [style=invis, weight=10];\n'
 
             actual_fila = actual_fila.siguiente
 
-        # 3. CONEXIONES VERTICALES ENTRE COLUMNAS
+        # Conexiones verticales entre columnas
         actual_col = self.columnas.primero
         while actual_col:
-            carnet_id = f'col_{sanitize_id(actual_col.id)}'
-            vertical_chain = [carnet_id]
+            col_id = sanitize_id(actual_col.id)
+            prev_node = f'col_{col_id}'
 
             actual_fila = self.filas.primero
             while actual_fila:
+                fila_id = sanitize_id(actual_fila.id)
                 nodo_id = None
                 actual_nota = actual_fila.acceso
                 while actual_nota:
                     if actual_nota.y == actual_col.id:
-                        nodo_id = f'nota_{sanitize_id(actual_nota.x)}_{sanitize_id(actual_nota.y)}'
+                        nodo_id = f'nota_{sanitize_id(actual_nota.x)}_{col_id}'
                         break
                     actual_nota = actual_nota.siguiente
 
                 if nodo_id is None:
-                    nodo_id = f'empty_{sanitize_id(actual_fila.id)}_{sanitize_id(actual_col.id)}'
+                    nodo_id = f'empty_{fila_id}_{col_id}'
 
-                vertical_chain.append(nodo_id)
+                dot += f'    {prev_node} -> {nodo_id} [dir=both, color=gray];\n'
+                prev_node = nodo_id
 
                 actual_fila = actual_fila.siguiente
 
-            for i in range(len(vertical_chain) - 1):
-                dot.append(f'    {vertical_chain[i]} -> {vertical_chain[i + 1]} [dir=both, color=gray];')
-
             actual_col = actual_col.siguiente
 
-        dot.append('}')
-        return '\n'.join(dot)
-
+        dot += '}\n'
+        return dot
+    
     def obtener_actividades(self):
         actividades = []
         actual = self.filas.primero
         while actual is not None:
-            actividades.append(actual.id) # gay el que lo lea
+            actividades.append(actual.id) 
             actual = actual.siguiente
         return actividades
 

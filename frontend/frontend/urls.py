@@ -19,6 +19,7 @@ from django.urls import path
 from login.views import login_view
 from administrador.views import dashboard_admin, ver_usuarios, informacion, cerrar_sesion
 from tutor.views import cargar_horarios, cargar_notas, reportes
+from Estudiante.views import ver_notas_estudiante
 
 urlpatterns = [
     path('admin/', admin.site.urls),  # Admin real de Django
@@ -30,6 +31,6 @@ urlpatterns = [
     path('pagina-tutor/', cargar_horarios, name='cargar_horarios'),
     path('tutor/cargar-notas/', cargar_notas, name='cargar_notas'),
     path('reportes/', reportes, name='reportes'),  # <-- Esta línea soluciona el error
-
+    path('estudiante/', ver_notas_estudiante),
     
 ]

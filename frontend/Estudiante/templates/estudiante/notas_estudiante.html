@@ -1,0 +1,56 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Notas del Estudiante</title>
+    <link rel="stylesheet" href="{% static 'css/estudiante.css' %}">
+</head>
+<body>
+
+    <nav class="nav-estudiante">
+        <a href="{% url 'cerrar_sesion' %}" class="cerrar">Cerrar Sesión</a>
+    </nav>
+
+    <h1>Bienvenido, {{ request.session.nombre_usuario }}</h1>
+
+    <form method="get">
+        <label for="curso">Selecciona un curso:</label>
+        <select name="curso" id="curso">
+            <option value="">-- Selecciona --</option>
+            {% for curso in cursos %}
+                <option value="{{ curso.codigo }}" {% if curso.codigo == curso_seleccionado %}selected{% endif %}>
+                    {{ curso.nombre }} ({{ curso.codigo }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn">Consultar</button>
+    </form>
+
+    {% if notas %}
+        <h2>Actividades del curso seleccionado</h2>
+        <table class="tabla-horarios">
+            <thead>
+                <tr>
+                    <th>Actividad</th>
+                    <th>Nota</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nota in notas %}
+                    <tr>
+                        <td>{{ nota.actividad }}</td>
+                        <td>{{ nota.nota }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Promedio del curso: {{ promedio }}</h3>
+    {% else %}
+        <p>No hay notas disponibles para el curso seleccionado.</p>
+    {% endif %}
+</body>
+</html>

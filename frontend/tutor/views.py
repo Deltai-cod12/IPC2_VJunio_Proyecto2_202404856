@@ -1,5 +1,13 @@
+import io
 from django.shortcuts import render
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
+from PIL import Image
 import requests
+import os
+from django.conf import settings
 
 def cargar_horarios(request):
     contenido = ""
@@ -154,6 +162,7 @@ def reportes(request):
     imagen_top = None
     curso_seleccionado = ""
     actividad_seleccionada = ""
+    error = None
 
     id_tutor = request.session.get("id_tutor", "")
 
@@ -169,6 +178,7 @@ def reportes(request):
                 actividades_por_curso[curso["codigo"]] = curso["actividades"]
     except Exception as e:
         print("[ERROR] No se pudo conectar con Flask:", e)
+        error = "No se pudo conectar con el servidor backend."
 
     if request.method == "POST":
         accion = request.POST.get("accion")
@@ -183,8 +193,10 @@ def reportes(request):
                 r = requests.get("http://127.0.0.1:5000/api/tutor/reporte/promedio", params={"codigo_curso": curso_seleccionado})
                 if r.status_code == 200:
                     imagen_promedio = r.json().get("ruta")
-            except:
-                pass
+                else:
+                    error = f"Error al obtener reporte promedio: {r.status_code}"
+            except Exception as e:
+                error = f"Error al obtener reporte promedio: {e}"
 
         elif accion == "Top de Notas" and curso_seleccionado and actividad_seleccionada:
             try:
@@ -194,8 +206,33 @@ def reportes(request):
                 })
                 if r.status_code == 200:
                     imagen_top = r.json().get("ruta")
-            except:
-                pass
+                else:
+                    error = f"Error al obtener reporte top: {r.status_code}"
+            except Exception as e:
+                error = f"Error al obtener reporte top: {e}"
+
+        elif accion == "Exportar PDF":
+            # Definir qué imagen exportar (prioriza top si está seleccionado)
+            imagen_a_exportar = None
+            if actividad_seleccionada and curso_seleccionado:
+                imagen_a_exportar = f"reporte_top_{curso_seleccionado}_{actividad_seleccionada}.png".replace(" ", "_")
+            elif curso_seleccionado:
+                imagen_a_exportar = f"promedio_{curso_seleccionado}.png"
+
+            if not imagen_a_exportar:
+                error = "No hay imagen seleccionada para exportar PDF."
+            else:
+                url_pdf = f"http://127.0.0.1:5000/api/tutor/reporte/exportar_pdf?imagen={imagen_a_exportar}"
+                try:
+                    r = requests.get(url_pdf)
+                    if r.status_code == 200:
+                        response = HttpResponse(r.content, content_type='application/pdf')
+                        response['Content-Disposition'] = f'attachment; filename="{imagen_a_exportar}.pdf"'
+                        return response
+                    else:
+                        error = f"Error al generar PDF: {r.status_code} - {r.text}"
+                except Exception as e:
+                    error = f"Error conectando con backend para exportar PDF: {e}"
 
     return render(request, "tutor/reportes.html", {
         "cursos": cursos,
@@ -203,5 +240,60 @@ def reportes(request):
         "curso_seleccionado": curso_seleccionado,
         "actividad_seleccionada": actividad_seleccionada,
         "imagen_promedio": imagen_promedio,
-        "imagen_top": imagen_top
+        "imagen_top": imagen_top,
+        "error": error
     })
+    
+from reportlab.lib.utils import ImageReader
+
+def exportar_pdf(request):
+    imagen_nombre = request.GET.get('imagen')
+    if not imagen_nombre:
+        return HttpResponse("No se proporcionó el nombre de la imagen.", status=400)
+
+    try:
+        # Ruta absoluta: static/reportes/imagen_nombre
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'reportes'))
+        ruta_imagen = os.path.join(base_dir, imagen_nombre)
+
+        if not os.path.exists(ruta_imagen):
+            return HttpResponse("Imagen no encontrada en el servidor.", status=404)
+
+        # Abrir imagen con PIL
+        imagen_pil = Image.open(ruta_imagen).convert("RGB")  # Asegura formato correcto
+
+        # Redimensionar
+        width_page, height_page = letter
+        max_width = width_page - 100
+        max_height = height_page - 100
+
+        img_width, img_height = imagen_pil.size
+        ratio = min(max_width / img_width, max_height / img_height, 1)
+        new_width = int(img_width * ratio)
+        new_height = int(img_height * ratio)
+
+        imagen_pil = imagen_pil.resize((new_width, new_height), Image.ANTIALIAS)
+
+        # Convertir a ImageReader
+        img_reader = ImageReader(imagen_pil)
+
+        # Crear PDF
+        buffer = io.BytesIO()
+        c = canvas.Canvas(buffer, pagesize=letter)
+
+        x = 50
+        y = height_page - new_height - 50
+
+        c.drawImage(img_reader, x, y, width=new_width, height=new_height)
+        c.showPage()
+        c.save()
+
+        pdf = buffer.getvalue()
+        buffer.close()
+
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{imagen_nombre}.pdf"'
+        return response
+
+    except Exception as e:
+        return HttpResponse(f"Error al generar PDF: {e}", status=500)

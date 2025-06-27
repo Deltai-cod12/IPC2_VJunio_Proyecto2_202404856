@@ -27,7 +27,10 @@ def login_view(request):
                     request.session['nombre_tutor'] = usuario   #  Nombre para mostrar
                     return redirect('/pagina-tutor')
                 elif tipo == "estudiante":
-                    return redirect('/estudiante')
+                    request.session['tipo_usuario'] = 'estudiante'
+                    request.session['id_usuario'] = usuario
+                    request.session['id_estudiante'] = usuario
+                    return redirect('/estudiante/')  # Asegúrate que este path esté bien definido
             else:
                 mensaje_error = data.get("error", "Credenciales incorrectas.")
         except Exception as e:

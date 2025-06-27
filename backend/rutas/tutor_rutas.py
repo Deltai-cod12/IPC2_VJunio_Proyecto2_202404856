@@ -1,11 +1,15 @@
 from flask import Blueprint, request, jsonify
+from flask import send_file, abort
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
+from PIL import Image
 import io
 import os
 from servicios.carga_config import cursos, usuarios
 from servicios.carga_horarios import procesar_xml_horarios
 from servicios.carga_notas import parse_notas_xml, cargar_notas_en_matriz
 from servicios.graficador_matriz import graficar_matriz 
-from MatrizDispersa.MatrizDispersa import MatrizDispersa
 import plotly.graph_objects as go
 
 tutor_bp = Blueprint('tutor_bp', __name__)
@@ -192,3 +196,45 @@ def reporte_top():
     fig.write_image(ruta_completa)
 
     return jsonify({"ruta": ruta})
+
+@tutor_bp.route('/reporte/exportar_pdf', methods=['GET'])
+def exportar_pdf():
+    nombre_imagen = request.args.get('imagen')
+    if not nombre_imagen:
+        return abort(400, "Parámetro 'imagen' es obligatorio")
+
+    ruta_imagen = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static', 'reportes', nombre_imagen))
+    if not os.path.isfile(ruta_imagen):
+        return abort(404, "Imagen no encontrada")
+
+    try:
+        img = Image.open(ruta_imagen).convert("RGB")
+        img_width, img_height = img.size
+
+        max_width = 500
+        if img_width > max_width:
+            ratio = max_width / float(img_width)
+            img_width = max_width
+            img_height = int(img_height * ratio)
+
+            # Reescalado compatible con Pillow >=10
+            try:
+                img = img.resize((img_width, img_height), Image.Resampling.LANCZOS)
+            except AttributeError:
+                img = img.resize((img_width, img_height), Image.ANTIALIAS)
+
+        img_reader = ImageReader(img)
+
+        buffer = io.BytesIO()
+        p = canvas.Canvas(buffer, pagesize=letter)
+        page_height = letter[1]
+
+        p.drawImage(img_reader, 50, page_height - img_height - 50, width=img_width, height=img_height)
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+
+        return send_file(buffer, mimetype='application/pdf', as_attachment=True, download_name='reporte.pdf')
+
+    except Exception as e:
+        return abort(500, f"Error al generar PDF: {str(e)}")
